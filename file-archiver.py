@@ -35,7 +35,7 @@ class arch_extr:
         body = content
 
         name, ext = os.path.splitext(path_to_file)
-        perm = oct(os.stat(path_to_file)[ST_MODE])
+        perm = os.stat(path_to_file)[ST_MODE]
         stat_info = os.stat(path_to_file)
         uid = pwd.getpwuid(stat_info.st_uid)[0]
         gid = grp.getgrgid(stat_info.st_gid)[0]
@@ -134,9 +134,11 @@ class arch_extr:
             create_file = open(path_file_creation, "w+")
             create_file.write(body)
             create_file.close()
+            perm = int(l[2])
             uid = pwd.getpwnam(l[3])[2]
             gid = pwd.getpwnam(l[4])[3]
             os.chown(path_file_creation, uid, gid)
+            os.chmod(path_file_creation, perm)
 
 
 archiver = arch_extr()
