@@ -134,6 +134,9 @@ class arch_extr:
             create_file = open(path_file_creation, "w+")
             create_file.write(body)
             create_file.close()
+            uid = pwd.getpwnam(l[3])[2]
+            gid = pwd.getpwnam(l[4])[3]
+            os.chown(path_file_creation, uid, gid)
 
 
 archiver = arch_extr()
