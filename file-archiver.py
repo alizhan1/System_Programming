@@ -7,6 +7,7 @@ from stat import *
 import pwd
 import grp
 import ast
+import codecs
 
 class arch_extr:
 
@@ -30,7 +31,8 @@ class arch_extr:
 
     def pre_archiver(self, path_to_file):
 
-        content = open(path_to_file, "rb").read()
+        output = open(path_to_file, "rb").read()
+        content = output.decode('latin-1').encode("utf-8")
 
         body = content
 
@@ -131,7 +133,7 @@ class arch_extr:
             
             path_file_creation = path_to_extraction + file_name + file_ext
 
-            create_file = open(path_file_creation, "w+")
+            create_file = codecs.open(path_file_creation, "w+", "utf-8")
             create_file.write(body)
             create_file.close()
             perm = int(l[2])
