@@ -31,8 +31,8 @@ class arch_extr:
 
     def pre_archiver(self, path_to_file):
 
-        output = open(path_to_file, "rb").read()
-        content = output.decode('latin-1').encode("utf-8")
+        output = open(path_to_file, "rb").read(2048)
+        content = output.decode('latin-1')
 
         body = content
 
@@ -43,7 +43,6 @@ class arch_extr:
         gid = grp.getgrgid(stat_info.st_gid)[0]
         size = os.stat(path_to_file).st_size 
         time = os.path.getmtime(path_to_file)
-
         header = [
             name,
             ext,
@@ -55,8 +54,7 @@ class arch_extr:
         ]
 
         str_header = "{}".format(header)
-        str_body = "{}".format(content)
-        self.pre_archive[str_header] = str_body
+        self.pre_archive[str_header] = body
     
     def get_filepaths(self, directory):
   
@@ -72,12 +70,12 @@ class arch_extr:
     def dict_to_binary(self):
         str = json.dumps(self.pre_archive)
         binary = ' '.join(format(ord(letter), 'b') for letter in str)
-        return binary
+        return binary.encode("utf-8")
     
     def binary_to_dict(self, the_binary):
         jsn = ''.join(chr(int(x, 2)) for x in the_binary.split())
-        dict = json.loads(jsn)  
-        return dict
+        pre_dict = json.loads(jsn)  
+        return pre_dict
 
 
     def dir_pre_archiver(self, path_to_folder):
@@ -106,8 +104,8 @@ class arch_extr:
     
         content_arch = open(path_to_archiver, "rb").read()
         fin_dict = self.binary_to_dict(content_arch)
-
-        for header, body in fin_dict.iteritems():
+        for header in fin_dict:
+            body = fin_dict[header]
             l = ast.literal_eval(header)
             path_to_fol = os.path.dirname(os.path.abspath(__file__))
             
@@ -133,8 +131,9 @@ class arch_extr:
             
             path_file_creation = path_to_extraction + file_name + file_ext
 
-            create_file = codecs.open(path_file_creation, "w+", "utf-8")
-            create_file.write(body)
+            create_file = open(path_file_creation, "wb+")
+            checker = body.encode("latin-1")
+            create_file.write(checker)
             create_file.close()
             perm = int(l[2])
             uid = pwd.getpwnam(l[3])[2]
@@ -144,6 +143,6 @@ class arch_extr:
 
 
 archiver = arch_extr()
-archiver.archive("/home/osboxes/Desktop/Test_prog/")
+archiver.archive("/home/osboxes/Downloads/christmas-music_-_the-final-countdown.mp3")
 archiver.post_archiver()
 archiver.extractor()
